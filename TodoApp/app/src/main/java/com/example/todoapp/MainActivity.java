@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     EditText etGetDescription;
     Button btnCreateTodo;
     TodoAdapter todoAdapter;
-    int currentTodoID = 0;
+
     DatabaseHelper databaseHelper;
 
     @Override
@@ -41,29 +42,18 @@ public class MainActivity extends AppCompatActivity {
             createTodo();
         });
 
-        todos = new ArrayList<>();
+        databaseHelper = new DatabaseHelper(MainActivity.this);
 
-        Todo t1 = new Todo(currentTodoID, "De terminat proiectul asta",
-                "ar trebui sa fie gata azi",
-                new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(new Date()));
-        todos.add(t1);
-        currentTodoID++;
-        Todo t2 = new Todo(currentTodoID, "Interviu tehnic miercuri",
-                "interviu tehnic la ness digital engineering",
-                new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(new Date()));
+        todos = databaseHelper.selectAll();
+        Log.d("LIST_SIZE", String.valueOf(todos.size()));
 
-        todos.add(t2);
-        currentTodoID++;
-        todos.get(0).setTitle("test programaticaaa");
-
-//        Toast.makeText(this, "ID-ul curent este: " + String.valueOf(currentTodoID), Toast.LENGTH_SHORT).show();
         todoAdapter = new TodoAdapter(this, todos);
 
         listView.setAdapter(todoAdapter);
 
+
         listView.setOnItemClickListener((parent, view, position, id) -> {
             String selectedTodo = parent.getItemAtPosition(position).toString();
-//            Toast.makeText(this, selectedTodo, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, TodoActivity.class);
             intent.putExtra("Todo", todos.get(position));
             startActivityForResult(intent, EDIT_TODO_REQUEST_CODE);
@@ -77,14 +67,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Introdu date", Toast.LENGTH_SHORT).show();
         } else {
             String date = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(new Date());
-            todos.add(new Todo(currentTodoID, title, description, date));
-//                Toast.makeText(this, String.valueOf(todos.size()), Toast.LENGTH_SHORT).show();
+            Todo newTodo = new Todo(title, description, date);
+            todos.add(newTodo);
+            boolean inserted = databaseHelper.insertTodo(newTodo);
+            Toast.makeText(this, "Success=" + inserted, Toast.LENGTH_SHORT).show();
             todoAdapter.notifyDataSetChanged();
-            currentTodoID++;
             listView.setAdapter(todoAdapter);
             etGetTitle.setText("");
             etGetDescription.setText("");
-//                Toast.makeText(this, "ID-ul curent este: " + String.valueOf(currentTodoID), Toast.LENGTH_SHORT).show();
         }
     }
 
