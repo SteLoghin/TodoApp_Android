@@ -27,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //    se apeleaza prima oara cand baza de date e accesata
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTableStatement= "CREATE TABLE " + TODO_TABLE +
+        String createTableStatement = "CREATE TABLE " + TODO_TABLE +
                 " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_TITLE + " TEXT," +
                 " " + COLUMN_DESCRIPTION + " TEXT, " + COLUMN_CREATED_AT + " TEXT )";
 
@@ -40,13 +40,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean insertTodo(Todo todo){
-        SQLiteDatabase db=this.getWritableDatabase();
-        ContentValues cv=new ContentValues();
+    public boolean insertTodo(Todo todo) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
 
-        cv.put(COLUMN_TITLE,todo.getTitle());
-        cv.put(COLUMN_DESCRIPTION,todo.getDescription());
-        cv.put(COLUMN_CREATED_AT,todo.getDate());
+        cv.put(COLUMN_TITLE, todo.getTitle());
+        cv.put(COLUMN_DESCRIPTION, todo.getDescription());
+        cv.put(COLUMN_CREATED_AT, todo.getDate());
 
         long insert = db.insert(TODO_TABLE, null, cv);
 
@@ -55,25 +55,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return insert != -1;
     }
 
-    public ArrayList<Todo> selectAll(){
-        ArrayList<Todo> results=new ArrayList<>();
-        String sql="SELECT * from " + TODO_TABLE;
-        SQLiteDatabase db=this.getReadableDatabase();
+    public ArrayList<Todo> selectAll() {
+        ArrayList<Todo> results = new ArrayList<>();
+        String sql = "SELECT * from " + TODO_TABLE;
+        SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor=db.rawQuery(sql,null);
+        Cursor cursor = db.rawQuery(sql, null);
 
-        if(cursor.moveToFirst()){
-            do{
-                int id=cursor.getInt(0);
-                String title=cursor.getString(1);
-                String description=cursor.getString(2);
-                String date=cursor.getString(3);
-                results.add(new Todo(id,title,description,date));
-            }while(cursor.moveToNext());
-        }else
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(0);
+                String title = cursor.getString(1);
+                String description = cursor.getString(2);
+                String date = cursor.getString(3);
+                results.add(new Todo(id, title, description, date));
+            } while (cursor.moveToNext());
+        } else
 
-        db.close();
+            db.close();
         cursor.close();
         return results;
+    }
+
+    public boolean deleteTodo(int todoID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long bool = db.delete(TODO_TABLE, COLUMN_ID + "=?", new String[]{String.valueOf(todoID)});
+        db.close();
+        return bool > 0;
+    }
+
+    public boolean updateTodo(Todo todo) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_TITLE, todo.getTitle());
+        cv.put(COLUMN_DESCRIPTION, todo.getDescription());
+        long bool = db.update(TODO_TABLE, cv, COLUMN_ID + "=?", new String[]{String.valueOf(todo.getID())});
+        db.close();
+        return bool > 0;
     }
 }

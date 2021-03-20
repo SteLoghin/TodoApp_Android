@@ -33,7 +33,7 @@ public class TodoActivity extends AppCompatActivity {
         editDescription.setText(todo.getDescription());
         String date = createdAt.getText().toString() + todo.getDate();
         createdAt.setText(date);
-        Toast.makeText(this, "ID este: "+String.valueOf(todo.getID()), Toast.LENGTH_LONG).show();
+
 
         btnSaveChanges = findViewById(R.id.btnSaveChanges);
         btnDelete = findViewById(R.id.btnDelete);
@@ -51,8 +51,8 @@ public class TodoActivity extends AppCompatActivity {
     }
 
     private void saveChanges() {
-        todo.setTitle(editTitle.getText().toString().trim());
-        todo.setDescription(editDescription.getText().toString().trim());
+        todo.setTitle(editTitle.getText().toString());
+        todo.setDescription(editDescription.getText().toString());
         Intent intent=new Intent();
         intent.putExtra("operation","edit");
         intent.putExtra("Todo",todo);

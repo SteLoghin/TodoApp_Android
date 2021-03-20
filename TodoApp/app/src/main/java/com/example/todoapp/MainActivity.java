@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == EDIT_TODO_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data.getStringExtra("operation").equals("edit")) {
                 Todo changedTodo = data.getParcelableExtra("Todo");
@@ -90,9 +89,11 @@ public class MainActivity extends AppCompatActivity {
                         todos.set(i, changedTodo);
                         todoAdapter.notifyDataSetChanged();
                         listView.setAdapter(todoAdapter);
+                        boolean updated = databaseHelper.updateTodo(changedTodo);
+                        Toast.makeText(this, "Am updatat: " + updated, Toast.LENGTH_SHORT).show();
+                        break;
                     }
                 }
-//                Toast.makeText(this, data.getParcelableExtra("Todo").toString(), Toast.LENGTH_SHORT).show();
             } else if (data.getStringExtra("operation").equals("delete")) {
                 int idToBeDeleted = data.getIntExtra("todoID", 0);
                 for (int i = 0; i < todos.size(); i++) {
@@ -100,11 +101,12 @@ public class MainActivity extends AppCompatActivity {
                         todos.remove(todos.get(i));
                         todoAdapter.notifyDataSetChanged();
                         listView.setAdapter(todoAdapter);
+                        boolean deleted = databaseHelper.deleteTodo(idToBeDeleted);
+                        Toast.makeText(this, "Am sters: " + deleted, Toast.LENGTH_SHORT).show();
+                        break;
                     }
                 }
             }
         }
-
-
     }
 }
